@@ -1,6 +1,10 @@
+import datetime
+import os
 import textwrap
+import uuid
 
 import google.generativeai as genai
+from gtts import gTTS
 
 import re
 import json
@@ -47,3 +51,20 @@ def extract_json(text_response):
         return json_obj
     except json.JSONDecodeError:
         return None  # Handle invalid JSON or further refine error handling
+
+def text_to_speech(text, output_dir='static/speech_files'):
+    try:
+        # Ensure output directory exists
+        os.makedirs(output_dir, exist_ok=True)
+
+        output_file = f"{output_dir}/speech_output.mp3"
+
+        # Create the speech file
+        tts = gTTS(text=text, lang="en", tld='com.au', slow=False)
+        tts.save(output_file)
+
+        # Return just the filename for URL generation
+        return os.path.basename(output_file)
+    except Exception as e:
+        print(f"Error generating speech file: {e}")
+        return None
