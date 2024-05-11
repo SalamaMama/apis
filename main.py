@@ -27,8 +27,7 @@ def gen_motivation():
     mood = str(request.form['mood'].lower())
     preferences = ['simple language'] # TODO: Scaffold in frontend
 
-    motivational_qoutes = f"Given the user's current emotion of {mood}, their preferences {preferences}, the desired response tone {tone} and the current domain is {domain} generate a json containing five motivational messages. Each message should be crafted to uplift the user, align with their preferences, and be delivered in the specified tone"
-
+    motivational_qoutes = f"Given the user's current emotion of '{mood}', their preferences {preferences}, the desired response tone {tone}, and the current domain is '{domain}', generate a JSON object containing five motivational messages. The JSON should have a key named 'messages' where the value is an array of message objects. Each object should include keys for 'message' and 'additional_info', with the 'message' key containing the motivational text crafted to uplift the user, align with their preferences, and be delivered in the specified tone."
 
     response = normal_model.generate_content(motivational_qoutes)
     
@@ -52,6 +51,24 @@ def chat_response():
     
     # Assuming 'extract_json' is a function you've defined to parse the AI's response
     return extract_json(response.text), 200
+
+@app.route("/feed", methods=['POST'])
+def feed():
+    # Constants
+    domain = 'post partum depression'
+    mood = str(request.form['mood'].lower())
+    preferences = ['simple language']  # TODO: Scaffold in frontend
+
+    # Crafting the AI prompt
+    content = f"Given the user's current mood, which is '{mood}', and their preferences that include {preferences}, generate a detailed JSON object containing personalized content for their feed. This JSON should have three main keys: 'activities', 'articles', and 'informative_material', each containing at least three items. Each item in these categories should include keys for 'title', 'description', 'detailed_info', 'image_url', and 'benefit'. The content should be tailored to uplift, educate, and positively influence the user's emotional state in the context of {domain}. Include relevant images for each content type to enhance visual engagement and ensure all information is practical, supportive, and aligns with the latest research on postpartum care."
+
+    # Sending the message to the AI model
+    response = normal_model.generate_content(content)
+
+    
+    # Assuming 'extract_json' is a function you've defined to parse the AI's response
+    return extract_json(response.text), 200
+
 
 @app.route("/speech", methods=['POST'])
 def speech():
