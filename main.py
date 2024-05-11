@@ -1,8 +1,8 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, url_for
 from flask_cors import CORS
 import os
 
-from helpers import extract_json, get_chat_model, get_normal_model
+from helpers import extract_json, get_chat_model, get_normal_model, text_to_speech
 
 app = Flask(__name__)
 CORS(app)
@@ -52,6 +52,35 @@ def chat_response():
     
     # Assuming 'extract_json' is a function you've defined to parse the AI's response
     return extract_json(response.text), 200
+
+@app.route("/speech", methods=['POST'])
+def speech():
+    # Check if 'text' key exists in form data
+    if 'text' not in request.form:
+        return jsonify({'error': 'Missing text parameter'}), 400
+
+    # Safely extract and process text input
+    text = request.form['text'].strip().lower()
+    if not text:
+        return jsonify({'error': 'Text parameter is empty'}), 400
+
+    try:
+        # Assuming text_to_speech is a function that returns the filename of the generated speech file
+        speech_file = 'speech_files/'+text_to_speech(text=text)
+
+        print(speech_file)
+        if not speech_file:
+            return jsonify({'error': 'Failed to generate speech'}), 500
+
+        # Construct the full URL to access the generated speech file
+        speech_url = url_for('static', filename=speech_file, _external=True)
+
+        # Return the URL to the speech file in a JSON response
+        return jsonify({'speech_url': speech_url}), 200
+
+    except Exception as e:
+        # Log the exception or handle it as appropriate
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
