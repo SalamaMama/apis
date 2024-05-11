@@ -99,6 +99,24 @@ def speech():
         # Log the exception or handle it as appropriate
         return jsonify({'error': str(e)}), 500
 
+@app.route("/generate_story", methods=['POST'])
+def generate_story():
+    # Check if required data is present
+    if 'mood' not in request.form or 'preferences' not in request.form:
+        return jsonify({'error': 'Missing required parameters: mood and preferences'}), 400
+
+    # Extract mood and preferences from the form
+    mood = request.form['mood']
+    preferences = request.form['preferences']
+
+    # Generate the prompt for the story
+    prompt = f"Given the user's current mood, which is '{mood}', and their specific preferences, which include {preferences}, generate a detailed and engaging story. This story should be tailored specifically for a user dealing with postpartum depression. It should include practical coping mechanisms, motivational messages that inspire hope and strength, and accurate educational information about postpartum depression. The story should help the user feel understood and supported, and encourage positive emotional engagement."
+
+    response = normal_model.generate_content(prompt)
+
+    # Return the generated story in a JSON response
+    return jsonify({'story': response.text}), 200
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
