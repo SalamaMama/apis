@@ -1,4 +1,5 @@
 import os
+from dotenv import load_dotenv
 
 import google.generativeai as genai
 from gtts import gTTS
@@ -6,7 +7,8 @@ from gtts import gTTS
 import re
 import json
 
-GOOGLE_API_KEY = 'AIzaSyBeYvYSCPyPSLzrA67Uz4APOy2qPVbWOMs'
+load_dotenv() 
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 def model_setup():
     genai.configure(api_key=GOOGLE_API_KEY)
