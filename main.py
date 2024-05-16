@@ -43,7 +43,21 @@ def chat_response():
     chat_text = str(request.form['chat-text'].lower())
 
     # Crafting the AI prompt
-    tone_of_ai = f"Given the user's current emotion of {mood}, their preferences {preferences}, the desired response tone {tone}, and the ongoing conversation context: '{chat_text}' within the {domain} domain, generate a json containing keys for 'response', 'emotion_addressed', 'tone_used', and 'additional_info'. The values should provide a supportive and insightful message in the specified tone, detail the emotion being addressed, the tone used, and include any other relevant user interaction data."
+    tone_of_ai = f"""
+    Given the user's current emotion of '{mood}', their preferences '{preferences}', the desired response tone '{tone}', and the ongoing conversation context: '{chat_text}' within the {domain} domain, generate a JSON object containing the following keys:
+
+        1. response: A supportive and insightful message crafted in the specified tone that acknowledges both the user's current emotion and the ongoing conversation context. If there is a discrepancy between the user's stated mood ('{mood}') and the emotional tone of the chat context ('{chat_text}'), address the chat context first while gently guiding the user towards content that aligns with their stated mood.
+        2. emotion_addressed: The specific emotion being addressed based on the chat context.
+        3. tone_used: The tone used in the response, ensuring it matches the user's specified tone (e.g., comforting, encouraging, informative).
+        4. additional_info: Any other relevant user interaction data or suggestions for further support.
+
+    Ensure the response:
+
+        Balances the user's mood and the context of the conversation.
+        Validates the user's feelings expressed in the chat context and provides appropriate support or resources.
+        Aligns with the user's preferences and desired tone.
+        Is actionable, offering practical advice or steps where appropriate.
+    """
 
     # Sending the message to the AI model
     response = chat_model.send_message(tone_of_ai)
@@ -60,7 +74,23 @@ def feed():
     preferences = ['simple language']  # TODO: Scaffold in frontend
 
     # Crafting the AI prompt
-    content = f"Given the user's current mood, which is '{mood}', and their preferences that include {preferences}, generate a detailed JSON object containing personalized content for their feed. This JSON should have three main keys: 'activities', 'articles', and 'informative_material', each containing at least three items. Each item in these categories should include keys for 'title', 'description', 'detailed_info', 'image_url', and 'benefit'. The content should be tailored to uplift, educate, and positively influence the user's emotional state in the context of {domain}. Include relevant images for each content type to enhance visual engagement and ensure all information is practical, supportive, and aligns with the latest research on postpartum care."
+    content = f"""
+    Given the user's current mood, which is '{mood}', and their preferences that include {preferences}, generate a comprehensive JSON object containing personalized content for their feed. This JSON should have three main keys: 'activities', 'articles', and 'informative_material'. Each category should contain at least three items, with each item including the following keys:
+
+        title: A concise and engaging title that captures the essence of the content.
+        description: A brief summary that provides an overview of the content.
+        detailed_info: In-depth information or instructions that offer valuable insights or steps.
+        image_url: A URL linking to a high-quality and relevant image to enhance visual appeal.
+        benefit: A description of how this content will positively impact the user's emotional state and well-being.
+
+    The content should be designed to uplift, educate, and positively influence the user's emotional state within the context of {domain}. Ensure that:
+
+        Activities: Include interactive and engaging activities that the user can participate in to boost their mood and well-being.
+        Articles: Provide informative and insightful articles that offer support, education, and encouragement, backed by the latest research on postpartum care.
+        Informative Material: Offer practical tips, advice, and resources that are easy to implement and beneficial for the user's mental and emotional health.
+
+    Each piece of content should be tailored to the user's preferences, incorporating elements that resonate with them personally. Use a warm, empathetic tone to ensure the content feels supportive and encouraging. The information provided should be practical, relevant, and aligned with the latest research on postpartum care. Ensure visual engagement by including relevant and high-quality images for each content type.
+    """
 
     # Sending the message to the AI model
     response = normal_model.generate_content(content)
